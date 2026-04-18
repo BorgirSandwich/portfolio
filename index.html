@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lt;Name&gt; — Portfolio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =============================================================
+       DESIGN TOKENS
+       ============================================================= */
+    :root {
+      /* ── Background ──────────────────────────────── */
+      --bg-base:          #03091e;
+      --bg-deep:          #01040f;
+
+      /* ── True Frosted-Glass surfaces ─────────────── */
+      --glass-bg:         rgba(255,255,255,0.09);
+      --glass-border:     rgba(255,255,255,0.16);
+      --glass-hi:         rgba(255,255,255,0.22);
+      --glass-lo:         rgba(255,255,255,0.03);
+      --glass-body-bg:    rgba(4,10,34,0.82);
+      --glass-foot-bg:    rgba(2,6,22,0.90);
+
+      /* ── Gold accent ─────────────────────────────── */
+      --gold:             #C9A96E;
+      --gold-light:       #E2CA96;
+      --gold-vivid:       #D6B87E;
+      --gold-muted:       rgba(201,169,110,0.18);
+      --gold-on:          #06040e;
+
+      /* ── Text — WCAG AA-verified on #03091e ─────── */
+      --text-primary:     #F4F1EC;   /* 17:1  */
+      --text-secondary:   #CCC8C1;   /* 10:1  */
+      --text-muted:       #9B9792;   /* 5.2:1 */
+
+      /* ── Borders ─────────────────────────────────── */
+      --border:           rgba(255,255,255,0.10);
+      --border-gold:      rgba(201,169,110,0.32);
+
+      /* ── Typography ──────────────────────────────── */
+      --ff-display:       'Cormorant Garamond', Georgia, serif;
+      --ff-body:          'DM Sans', system-ui, sans-serif;
+      --ff-mono:          'DM Mono', 'Courier New', monospace;
+
+      /* ── Motion ──────────────────────────────────── */
+      --ease-out:         cubic-bezier(0.16, 1, 0.3, 1);
+      --dur-fast:         150ms;
+      --dur-base:         300ms;
+      --dur-slow:         480ms;
+      --dur-card:         420ms;
+
+      /* ── Shape ───────────────────────────────────── */
+      --r-card:           18px;
+
+      /* ── Z-layers ────────────────────────────────── */
+      --z-orb:            0;
+      --z-content:        2;
+      --z-nav:            100;
+      --z-card-active:    20;
+      --z-modal:          200;
+      --z-cursor:         999;
+    }
+
+    /* =============================================================
+       RESET & BASE
+       ============================================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; cursor: none; }
+
+    body {
+      /*
+        Layered liquid-glass background:
+        Deep navy base + aurora radial pools of cobalt/sapphire/violet.
+        Gradients composited for organic depth.
+      */
+      background-color: var(--bg-base);
+      background-image:
+        radial-gradient(ellipse 110% 65% at  0%   -5%, rgba(14,52,185,0.55)  0%, transparent 54%),
+        radial-gradient(ellipse  75% 55% at 100% 105%, rgba(7,30,110,0.50)   0%, transparent 56%),
+        radial-gradient(ellipse  55% 45% at  48%  48%, rgba(5,16,64,0.45)    0%, transparent 64%),
+        radial-gradient(ellipse  42% 36% at  76%  16%, rgba(22,70,200,0.30)  0%, transparent 50%),
+        radial-gradient(ellipse  34% 30% at  22%  80%, rgba(10,44,140,0.28)  0%, transparent 50%),
+        radial-gradient(ellipse  28% 24% at  62%  68%, rgba(44,20,110,0.20)  0%, transparent 50%);
+      color: var(--text-primary);
+      font-family: var(--ff-body);
+      font-weight: 400;
+      line-height: 1.65;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    ::selection { background: var(--gold-muted); color: var(--gold-light); }
+
+    /* =============================================================
+       AMBIENT FLOATING ORBS
+       ============================================================= */
+    .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: var(--z-orb); overflow: hidden; }
+    .bg-orb  { position: absolute; border-radius: 50%; }
+
+    .bg-orb-1 {
+      width: 720px; height: 720px;
+      background: radial-gradient(circle, rgba(18,68,230,0.22) 0%, transparent 70%);
+      filter: blur(100px);
+      top: -20%; left: -14%;
+      animation: orb-drift 24s ease-in-out infinite;
+    }
+    .bg-orb-2 {
+      width: 580px; height: 580px;
+      background: radial-gradient(circle, rgba(8,38,140,0.20) 0%, transparent 70%);
+      filter: blur(90px);
+      bottom: -14%; right: -12%;
+      animation: orb-drift 28s ease-in-out infinite reverse;
+    }
+    .bg-orb-3 {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(50,100,240,0.14) 0%, transparent 70%);
+      filter: blur(80px);
+      top: 40%; left: 54%;
+      animation: orb-drift 20s ease-in-out infinite;
+      animation-delay: -10s;
+    }
+    .bg-orb-4 {
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(70,28,160,0.16) 0%, transparent 70%);
+      filter: blur(70px);
+      top: 65%; left: 8%;
+      animation: orb-drift 18s ease-in-out infinite;
+      animation-delay: -6s;
+    }
+
+    @keyframes orb-drift {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33%      { transform: translate(30px,-42px) scale(1.07); }
+      66%      { transform: translate(-20px,26px) scale(0.95); }
+    }
+
+    /* Film-grain */
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.024;
+    }
+
+    #particle-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.52; }
+
+    /* =============================================================
+       CUSTOM CURSOR
+       ============================================================= */
+    #cursor-dot, #cursor-ring {
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: var(--z-cursor);
+      transform: translate(-50%,-50%);
+    }
+    #cursor-dot {
+      width: 6px; height: 6px; background: var(--gold); border-radius: 50%;
+      transition: transform var(--dur-fast) var(--ease-out);
+    }
+    #cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(201,169,110,0.55); border-radius: 50%;
+      transition: width var(--dur-base) var(--ease-out), height var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+    }
+    body.cursor-hover #cursor-ring { width: 58px; height: 58px; border-color: var(--gold); }
+    body.cursor-hover #cursor-dot  { transform: translate(-50%,-50%) scale(0.3); }
+
+    /* =============================================================
+       SCROLL REVEAL
+       ============================================================= */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out); }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 80ms; }
+    .reveal-delay-2 { transition-delay: 165ms; }
+    .reveal-delay-3 { transition-delay: 250ms; }
+    .reveal-delay-4 { transition-delay: 340ms; }
+
+    /* =============================================================
+       LAYOUT
+       ============================================================= */
+    .container { width: 100%; max-width: 1320px; margin-inline: auto; padding-inline: clamp(1.5rem,5vw,5rem); }
+    .section   { position: relative; z-index: var(--z-content); padding-block: clamp(6rem,12vw,10rem); }
+
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      font-family: var(--ff-mono); font-size: 0.6875rem; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-vivid);
+      margin-bottom: 1.25rem;
+    }
+    .eyebrow::before { content: ''; display: block; width: 28px; height: 1px; background: var(--gold); flex-shrink: 0; }
+
+    /* =============================================================
+       NAVIGATION
+       ============================================================= */
+    #nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: var(--z-nav);
+      padding-block: 1.5rem;
+      transition: background var(--dur-slow) var(--ease-out), padding var(--dur-base) var(--ease-out);
+    }
+    #nav.scrolled {
+      background: rgba(2,7,24,0.82);
+      backdrop-filter: blur(28px) saturate(1.7);
+      -webkit-backdrop-filter: blur(28px) saturate(1.7);
+      padding-block: 0.9rem;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo  { font-family: var(--ff-display); font-size: 1.4rem; font-weight: 500; letter-spacing: 0.04em; color: var(--text-primary); cursor: none; }
+    .nav-logo span { color: var(--gold); }
+    .nav-links { display: flex; align-items: center; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-family: var(--ff-body); font-size: 0.8125rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-secondary); cursor: none; position: relative;
+      transition: color var(--dur-base) var(--ease-out);
+    }
+    .nav-links a::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 1px; background: var(--gold); transition: width var(--dur-base) var(--ease-out); }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: none; padding: 4px; background: none; border: none; }
+    .nav-toggle span { display: block; width: 22px; height: 1px; background: var(--text-primary); transition: transform var(--dur-base) var(--ease-out), opacity var(--dur-base) var(--ease-out); }
+
+    .nav-mobile {
+      display: none; position: fixed; inset: 0;
+      background: rgba(2,6,20,0.96); backdrop-filter: blur(32px);
+      z-index: calc(var(--z-nav) - 1);
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--dur-slow) var(--ease-out);
+    }
+    .nav-mobile.open { opacity: 1; pointer-events: all; }
+    .nav-mobile-links { list-style: none; text-align: center; }
+    .nav-mobile-links li { margin-bottom: 2rem; }
+    .nav-mobile-links a { font-family: var(--ff-display); font-size: clamp(2.5rem,6vw,4rem); font-weight: 300; color: var(--text-primary); transition: color var(--dur-base) var(--ease-out); }
+    .nav-mobile-links a:hover { color: var(--gold); }
+
+    /* =============================================================
+       HERO
+       ============================================================= */
+    #hero { position: relative; min-height: 100dvh; display: flex; align-items: center; z-index: var(--z-content); overflow: hidden; }
+    .hero-ambient {
+      position: absolute; top: 44%; left: 50%; transform: translate(-50%,-50%);
+      width: 78vw; height: 78vw; max-width: 1000px; max-height: 1000px;
+      background: radial-gradient(ellipse at center, rgba(24,72,220,0.10) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-line-l, .hero-line-r { position: absolute; top: 0; width: 1px; height: 100%; background: rgba(255,255,255,0.04); }
+    .hero-line-l { left: clamp(1.5rem,5vw,5rem); }
+    .hero-line-r { right: clamp(1.5rem,5vw,5rem); }
+
+    .hero-content { position: relative; padding-top: 14vh; }
+    .hero-index   { font-family: var(--ff-mono); font-size: 0.6875rem; font-weight: 400; letter-spacing: 0.15em; color: var(--text-muted); margin-bottom: 2.5rem; }
+
+    .hero-name {
+      font-family: var(--ff-display); font-size: clamp(4.5rem,11vw,12rem);
+      font-weight: 300; line-height: 0.9; letter-spacing: -0.025em;
+      color: var(--text-primary); margin-bottom: 2rem;
+    }
+    .hero-name em { font-style: italic; color: var(--gold); display: block; }
+
+    .hero-desc {
+      font-family: var(--ff-body); font-size: clamp(1rem,1.5vw,1.125rem);
+      font-weight: 400; color: var(--text-secondary); max-width: 480px;
+      line-height: 1.85; margin-bottom: 4rem;
+    }
+
+    .hero-cta { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      padding: 0.9rem 2.125rem;
+      background: rgba(201,169,110,0.92);
+      color: var(--gold-on);
+      font-family: var(--ff-body); font-size: 0.8125rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.25); border-radius: 4px; cursor: none;
+      box-shadow: 0 2px 18px rgba(201,169,110,0.22), inset 0 1px 0 rgba(255,255,255,0.30);
+      transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+    }
+    .btn-primary:hover { background: rgba(255,255,255,0.10); color: var(--gold-light); box-shadow: 0 0 36px rgba(201,169,110,0.22), inset 0 1px 0 rgba(255,255,255,0.18); border-color: rgba(201,169,110,0.50); transform: translateY(-2px); }
+    .btn-primary svg { width: 14px; height: 14px; transition: transform var(--dur-base) var(--ease-out); }
+    .btn-primary:hover svg { transform: translateX(4px); }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: var(--ff-body); font-size: 0.8125rem; font-weight: 500;
+      letter-spacing: 0.06em; color: var(--text-secondary); text-transform: uppercase;
+      cursor: none; border-bottom: 1px solid rgba(255,255,255,0.22); padding-bottom: 3px;
+      transition: color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+    }
+    .btn-ghost:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.46); }
+
+    .hero-scroll { position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .hero-scroll-label { font-family: var(--ff-mono); font-size: 0.625rem; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); writing-mode: vertical-rl; transform: rotate(180deg); }
+    .hero-scroll-line  { width: 1px; height: 48px; background: linear-gradient(to bottom,var(--gold) 0%,transparent 100%); animation: scroll-pulse 2.2s ease-in-out infinite; }
+    @keyframes scroll-pulse { 0%,100%{ opacity:.3; transform:scaleY(.6); transform-origin:top } 50%{ opacity:1; transform:scaleY(1); transform-origin:top } }
+
+    /* =============================================================
+       ABOUT STRIP
+       ============================================================= */
+    #about-strip {
+      position: relative; z-index: var(--z-content); padding-block: 5rem;
+      background: rgba(255,255,255,0.045);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border-top: 1px solid rgba(255,255,255,0.10);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .about-grid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 3rem; }
+    .about-stat { text-align: center; }
+    .about-stat .num { font-family: var(--ff-display); font-size: clamp(3rem,5vw,5rem); font-weight: 300; color: var(--text-primary); line-height: 1; letter-spacing: -0.03em; }
+    .about-stat .num span { color: var(--gold); }
+    .about-stat .lbl { font-family: var(--ff-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-top: 0.5rem; }
+    .about-div { width: 1px; height: 80px; background: rgba(255,255,255,0.12); }
+
+    /* =============================================================
+       PORTFOLIO SECTION
+       ============================================================= */
+    #work { position: relative; z-index: var(--z-content); }
+    .work-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: clamp(3rem,5vw,5rem); flex-wrap: wrap; }
+    .section-title { font-family: var(--ff-display); font-size: clamp(3rem,7vw,7rem); font-weight: 300; line-height: 0.95; letter-spacing: -0.025em; color: var(--text-primary); }
+    .section-title em { font-style: italic; color: var(--gold); }
+    .work-count { font-family: var(--ff-mono); font-size: 0.6875rem; font-weight: 400; color: var(--text-muted); letter-spacing: 0.1em; padding-bottom: 0.5rem; }
+
+    /* =============================================================
+       PROJECT GRID
+       overflow:visible so 1.10× scaled cards are not clipped by the grid.
+       ============================================================= */
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+      gap: 1.75rem;
+      overflow: visible;
+    }
+
+    /* =============================================================
+       LIQUID FROSTED-GLASS CARD
+       ============================================================= */
+    .project-card {
+      position: relative;
+      /* White-tinted frosted glass film */
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px) saturate(1.95) brightness(1.06);
+      -webkit-backdrop-filter: blur(28px) saturate(1.95) brightness(1.06);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--r-card);
+      box-shadow:
+        0 4px 30px rgba(0,6,46,0.50),
+        inset 0 1px 0 var(--glass-hi),
+        inset 0 -1px 0 var(--glass-lo),
+        inset 0 0 0 0.5px rgba(255,255,255,0.06);
+      overflow: hidden;
+      cursor: none;
+      transform-origin: center center;
+      will-change: transform, opacity, filter;
+      transition:
+        transform     var(--dur-card) var(--ease-out),
+        opacity       var(--dur-card) var(--ease-out),
+        filter        var(--dur-card) var(--ease-out),
+        box-shadow    var(--dur-card) var(--ease-out),
+        border-color  var(--dur-card) var(--ease-out);
+    }
+
+    /* ── HOVERED: bold 1.10× zoom + elevated glass ── */
+    .project-card:hover {
+      transform: scale(1.10) translateZ(0);
+      z-index: var(--z-card-active);
+      border-color: rgba(255,255,255,0.30);
+      box-shadow:
+        0 36px 90px rgba(0,6,58,0.72),
+        0 10px 40px rgba(18,80,230,0.24),
+        0  0  64px rgba(80,140,255,0.13),
+        inset 0 1px 0 rgba(255,255,255,0.36),
+        inset 0 -1px 0 var(--glass-lo);
+    }
+
+    /*
+       INACTIVE SIBLINGS: scale down + dim so the hovered card
+       physically dominates and siblings appear to "move aside".
+    */
+    .project-grid:has(.project-card:hover) .project-card:not(:hover) {
+      transform: scale(0.93) translateZ(0);
+      opacity: 0.52;
+      filter: brightness(0.65) saturate(0.45);
+    }
+
+    /* Thumbnail */
+    .card-thumb { position: relative; width: 100%; padding-top: 62%; overflow: hidden; }
+    .card-thumb-inner { position: absolute; inset: 0; transition: transform var(--dur-slow) var(--ease-out); }
+    .project-card:hover .card-thumb-inner { transform: scale(1.04); }
+    .card-thumb-inner::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 42%, rgba(3,8,28,0.70) 100%);
+    }
+    .mockup-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    /* Category badge */
+    .card-badge {
+      position: absolute; top: 1rem; right: 1rem; z-index: 2;
+      background: rgba(2,7,26,0.78); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-gold); border-radius: 3px;
+      padding: 0.28rem 0.65rem;
+      font-family: var(--ff-mono); font-size: 0.5625rem; font-weight: 500;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-vivid);
+    }
+
+    /* ── Card body — dark semi-transparent backdrop for readability ── */
+    .card-body {
+      padding: 1.625rem 1.875rem;
+      background: var(--glass-body-bg);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex; flex-direction: column; gap: 0.7rem;
+    }
+    .card-title {
+      font-family: var(--ff-display); font-size: 1.875rem; font-weight: 400;
+      line-height: 1.08; letter-spacing: -0.01em; color: var(--text-primary);
+      transition: color var(--dur-base) var(--ease-out);
+    }
+    .project-card:hover .card-title { color: var(--gold-light); }
+    .card-desc { font-size: 0.9375rem; font-weight: 400; color: var(--text-secondary); line-height: 1.78; }
+    .card-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.2rem; }
+    .card-tag  {
+      padding: 0.25rem 0.6rem;
+      font-family: var(--ff-mono); font-size: 0.5625rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 3px;
+    }
+
+    /* ── Card footer — darkest layer ── */
+    .card-footer {
+      padding: 1rem 1.875rem;
+      background: var(--glass-foot-bg);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-year { font-family: var(--ff-mono); font-size: 0.625rem; font-weight: 400; letter-spacing: 0.14em; color: var(--text-muted); }
+    .card-expand-btn {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-family: var(--ff-mono); font-size: 0.5625rem; font-weight: 500;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-vivid);
+      background: none; border: none; cursor: none;
+      transition: gap var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+    }
+    .card-expand-btn:hover { color: var(--gold-light); gap: 0.65rem; }
+    .card-expand-btn svg { width: 11px; height: 11px; transition: transform var(--dur-base) var(--ease-out); }
+    .card-expand-btn:hover svg { transform: translateX(3px); }
+
+    /* =============================================================
+       EXPANDED CARD DRAWER
+       ============================================================= */
+    .card-expanded-overlay {
+      position: fixed; inset: 0;
+      background: rgba(1,4,16,0.80); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      z-index: var(--z-modal); opacity: 0; pointer-events: none;
+      transition: opacity var(--dur-slow) var(--ease-out);
+    }
+    .card-expanded-overlay.open { opacity: 1; pointer-events: all; }
+
+    .card-expanded-panel {
+      position: fixed; top: 0; right: 0; bottom: 0; width: min(640px,92vw);
+      background: rgba(4,11,36,0.93);
+      backdrop-filter: blur(36px) saturate(1.6); -webkit-backdrop-filter: blur(36px) saturate(1.6);
+      border-left: 1px solid rgba(255,255,255,0.14);
+      box-shadow: -20px 0 72px rgba(0,6,46,0.60), inset 1px 0 0 rgba(255,255,255,0.08);
+      z-index: var(--z-modal);
+      transform: translateX(100%); transition: transform var(--dur-slow) var(--ease-out);
+      overflow-y: auto; overscroll-behavior: contain;
+    }
+    .card-expanded-panel.open { transform: translateX(0); }
+
+    .expanded-close {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; justify-content: flex-end; padding: 1.5rem 2rem;
+      background: rgba(3,9,30,0.94); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .close-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-family: var(--ff-mono); font-size: 0.625rem; font-weight: 500;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--text-muted); background: none; border: none; cursor: none;
+      transition: color var(--dur-base) var(--ease-out);
+    }
+    .close-btn:hover { color: var(--text-primary); }
+    .close-btn svg { width: 14px; height: 14px; }
+
+    .expanded-thumb { width: 100%; padding-top: 54%; position: relative; overflow: hidden; }
+    .expanded-thumb-inner { position: absolute; inset: 0; }
+    .expanded-thumb-inner .mockup-svg { width: 100%; height: 100%; }
+
+    .expanded-body { padding: 2.5rem; }
+    .expanded-badge {
+      display: inline-block; margin-bottom: 1.25rem;
+      font-family: var(--ff-mono); font-size: 0.5625rem; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-vivid);
+      border: 1px solid var(--border-gold); border-radius: 3px; padding: 0.3rem 0.65rem;
+    }
+    .expanded-title { font-family: var(--ff-display); font-size: clamp(2rem,5vw,3rem); font-weight: 300; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 1.25rem; color: var(--text-primary); }
+    .expanded-desc  { font-size: 0.9375rem; font-weight: 400; color: var(--text-secondary); line-height: 1.85; margin-bottom: 2rem; }
+
+    .expanded-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 1.5rem 0; border-top: 1px solid rgba(255,255,255,0.09); border-bottom: 1px solid rgba(255,255,255,0.09); margin-bottom: 2rem; }
+    .meta-label { font-family: var(--ff-mono); font-size: 0.5625rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.35rem; }
+    .meta-value { font-family: var(--ff-body); font-size: 0.9375rem; font-weight: 500; color: var(--text-primary); }
+
+    .expanded-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 2.5rem; }
+    .expanded-tag  {
+      padding: 0.3rem 0.7rem; border-radius: 3px;
+      font-family: var(--ff-mono); font-size: 0.5625rem; font-weight: 400;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted);
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+      transition: border-color var(--dur-base), color var(--dur-base);
+    }
+    .expanded-tag:hover { border-color: var(--border-gold); color: var(--gold); }
+
+    .expanded-link {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      padding: 0.9rem 1.875rem; background: transparent;
+      border: 1px solid var(--gold); border-radius: 4px;
+      font-family: var(--ff-body); font-size: 0.8125rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); cursor: none;
+      transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+    }
+    .expanded-link:hover { background: var(--gold); color: var(--gold-on); transform: translateY(-2px); }
+    .expanded-link svg { width: 13px; height: 13px; }
+
+    /* =============================================================
+       CONTACT SECTION
+       ============================================================= */
+    #contact {
+      position: relative; z-index: var(--z-content);
+      background: rgba(255,255,255,0.035);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .contact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(3rem,6vw,7rem); align-items: start; }
+    .contact-title { font-family: var(--ff-display); font-size: clamp(3rem,6vw,6rem); font-weight: 300; line-height: 0.95; letter-spacing: -0.025em; color: var(--text-primary); margin-top: 1rem; }
+    .contact-title em { font-style: italic; color: var(--gold); }
+    .contact-sub { margin-top: 1.5rem; font-size: 0.9375rem; font-weight: 400; color: var(--text-secondary); line-height: 1.82; max-width: 360px; }
+
+    .contact-info { display: flex; flex-direction: column; }
+    .contact-item { display: flex; align-items: flex-start; justify-content: space-between; padding-block: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); gap: 1rem; }
+    .contact-item:first-child { border-top: 1px solid rgba(255,255,255,0.08); }
+    .ci-label { font-family: var(--ff-mono); font-size: 0.5625rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); flex-shrink: 0; padding-top: 3px; }
+    .ci-val   { text-align: right; }
+    .ci-val a { font-family: var(--ff-body); font-size: 0.9375rem; font-weight: 400; color: var(--text-primary); cursor: none; display: block; line-height: 1.6; transition: color var(--dur-base) var(--ease-out); }
+    .ci-val a:hover { color: var(--gold); }
+    .social-row { display: flex; gap: 1.25rem; justify-content: flex-end; flex-wrap: wrap; }
+    .social-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: var(--ff-mono); font-size: 0.5625rem; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-secondary);
+      cursor: none; transition: color var(--dur-base) var(--ease-out);
+    }
+    .social-link:hover { color: var(--gold); }
+    .social-link svg { width: 14px; height: 14px; }
+
+    /* =============================================================
+       FOOTER
+       ============================================================= */
+    #footer { position: relative; z-index: var(--z-content); padding-block: 2rem; border-top: 1px solid rgba(255,255,255,0.07); background: rgba(1,3,12,0.72); }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .footer-copy  { font-family: var(--ff-mono); font-size: 0.625rem; font-weight: 400; letter-spacing: 0.1em; color: var(--text-muted); }
+    .footer-mark  { font-family: var(--ff-display); font-size: 0.9rem; font-weight: 400; color: var(--text-muted); letter-spacing: 0.04em; }
+    .footer-mark span { color: var(--gold); }
+
+    /* =============================================================
+       RESPONSIVE
+       ============================================================= */
+    @media (max-width: 768px) {
+      .nav-links  { display: none; }
+      .nav-toggle { display: flex; }
+      .nav-mobile { display: flex; }
+      .about-grid { grid-template-columns: 1fr; gap: 1rem; }
+      .about-div  { display: none; }
+      .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .contact-sub { max-width: 100%; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+      .project-card:hover { transform: scale(1.05) translateZ(0); }
+      .project-grid:has(.project-card:hover) .project-card:not(:hover) { transform: scale(0.96) translateZ(0); }
+    }
+    @media (max-width: 480px) {
+      .hero-cta  { flex-direction: column; align-items: flex-start; }
+      .card-body   { padding: 1.25rem 1.375rem; }
+      .card-footer { padding: 0.875rem 1.375rem; }
+      .expanded-body { padding: 1.5rem; }
+      .expanded-meta { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Ambient orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+    <div class="bg-orb bg-orb-4"></div>
+  </div>
+
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+  <div id="cursor-dot"  aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- NAV -->
+  <nav id="nav" role="navigation" aria-label="Main navigation">
+    <div class="container">
+      <div class="nav-inner">
+        <a href="#hero" class="nav-logo" aria-label="Home">&lt;<span>Name</span>&gt;</a>
+        <ul class="nav-links" role="list">
+          <li><a href="#work">Work</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" id="nav-toggle">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+  <div class="nav-mobile" id="nav-mobile" role="dialog" aria-modal="true" aria-label="Mobile navigation">
+    <ul class="nav-mobile-links" role="list">
+      <li><a href="#work"    class="mobile-nav-link">Work</a></li>
+      <li><a href="#contact" class="mobile-nav-link">Contact</a></li>
+    </ul>
+  </div>
+
+  <main>
+
+    <!-- HERO -->
+    <section id="hero" aria-labelledby="hero-name">
+      <div class="hero-ambient" aria-hidden="true"></div>
+      <div class="hero-line-l" aria-hidden="true"></div>
+      <div class="hero-line-r" aria-hidden="true"></div>
+      <div class="container">
+        <div class="hero-content">
+          <p class="hero-index reveal" aria-hidden="true">001 — Portfolio</p>
+          <!-- ★ NAME PLACEHOLDER ★ -->
+          <h1 class="hero-name reveal reveal-delay-1" id="hero-name">
+            &lt;Name&gt;<em>Designer.</em>
+          </h1>
+          <!-- ★ SHORT DESCRIPTION PLACEHOLDER ★ -->
+          <p class="hero-desc reveal reveal-delay-2">
+            &lt;short description&gt; — crafting digital experiences where precision meets beauty, and every pixel serves a purpose.
+          </p>
+          <div class="hero-cta reveal reveal-delay-3">
+            <a href="#work" class="btn-primary" aria-label="View work">
+              View Work
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8h12M9 3l5 5-5 5"/></svg>
+            </a>
+            <a href="#contact" class="btn-ghost">Get in touch</a>
+          </div>
+        </div>
+      </div>
+      <div class="hero-scroll" aria-hidden="true">
+        <div class="hero-scroll-line"></div>
+        <span class="hero-scroll-label">Scroll</span>
+      </div>
+    </section>
+
+    <!-- ABOUT STRIP -->
+    <section id="about-strip" aria-label="Statistics">
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-stat reveal">
+            <div class="num">5<span>+</span></div>
+            <div class="lbl">Years of Craft</div>
+          </div>
+          <div class="about-div" aria-hidden="true"></div>
+          <div class="about-stat reveal reveal-delay-2">
+            <div class="num">40<span>+</span></div>
+            <div class="lbl">Projects Delivered</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section id="work" class="section" aria-labelledby="work-title">
+      <div class="container">
+        <div class="work-header">
+          <div>
+            <span class="eyebrow reveal">002 — Selected Work</span>
+            <h2 class="section-title reveal reveal-delay-1" id="work-title">
+              Featured<br><em>Projects</em>
+            </h2>
+          </div>
+          <p class="work-count reveal reveal-delay-2" id="project-count" aria-live="polite"></p>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════
+             PROJECT CARD GALLERY
+             ═══════════════════════════════════════════════════════
+             HOW TO MANAGE CARDS:
+               ADD:    Duplicate any <article class="project-card"> block.
+               REMOVE: Delete the entire <article>…</article> block.
+               EDIT:   Update data-* attributes, inner text, SVG gradient stops.
+             ═══════════════════════════════════════════════════════ -->
+        <div class="project-grid" id="project-grid" role="list" aria-label="Project gallery">
+
+          <!-- ─── CARD 1 — Web Design ─── -->
+          <article class="project-card reveal" role="listitem"
+            data-category="Web Design"
+            data-title="&lt;Project Title 01&gt;"
+            data-expanded-desc="&lt;A longer, richer description of Project 01 that appears in the expanded detail panel. Describe the problem, your approach, and the outcome.&gt;"
+            data-role="&lt;UI/UX Design &amp; Dev&gt;"
+            data-year="2024"
+            data-tags="Figma, React, Motion"
+            data-link="#"
+            tabindex="0" aria-label="Project: Project Title 01">
+
+            <div class="card-thumb" aria-hidden="true">
+              <div class="card-thumb-inner">
+                <!-- Browser-frame mockup -->
+                <svg class="mockup-svg" viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <linearGradient id="g1bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a1d55"/><stop offset="100%" stop-color="#1b3c90"/></linearGradient>
+                    <linearGradient id="g1acc" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#c9a96e" stop-opacity=".85"/><stop offset="100%" stop-color="#4a8aee" stop-opacity=".45"/></linearGradient>
+                    <linearGradient id="g1glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(255,255,255,0.12)"/><stop offset="100%" stop-color="rgba(255,255,255,0.04)"/></linearGradient>
+                  </defs>
+                  <rect width="400" height="250" fill="url(#g1bg)"/>
+                  <!-- Chrome bar -->
+                  <rect width="400" height="32" fill="rgba(0,0,0,0.52)"/>
+                  <circle cx="14" cy="16" r="4.5" fill="#ff5f57" opacity=".9"/><circle cx="27" cy="16" r="4.5" fill="#febc2e" opacity=".9"/><circle cx="40" cy="16" r="4.5" fill="#28c840" opacity=".9"/>
+                  <rect x="58" y="9" width="210" height="14" rx="3" fill="rgba(255,255,255,.10)"/><rect x="64" y="14" width="90" height="4" rx="1" fill="rgba(255,255,255,.28)"/>
+                  <!-- Hero headline -->
+                  <rect x="22" y="54" width="190" height="16" rx="2" fill="rgba(255,255,255,.48)"/>
+                  <rect x="22" y="78" width="140" height="9" rx="2" fill="rgba(255,255,255,.26)"/>
+                  <rect x="22" y="95" width="110" height="7" rx="2" fill="rgba(255,255,255,.16)"/>
+                  <rect x="22" y="116" width="80" height="24" rx="5" fill="url(#g1acc)"/>
+                  <!-- Card grid -->
+                  <rect x="22"  y="155" width="108" height="68" rx="5" fill="url(#g1glass)" stroke="rgba(255,255,255,.14)" stroke-width="1"/>
+                  <rect x="30"  y="163" width="50" height="7" rx="1" fill="rgba(255,255,255,.30)"/><rect x="30" y="178" width="70" height="5" rx="1" fill="rgba(255,255,255,.18)"/><rect x="30" y="191" width="55" height="5" rx="1" fill="rgba(255,255,255,.12)"/>
+                  <rect x="146" y="155" width="108" height="68" rx="5" fill="url(#g1glass)" stroke="rgba(255,255,255,.14)" stroke-width="1"/>
+                  <rect x="154" y="163" width="50" height="7" rx="1" fill="rgba(255,255,255,.30)"/><rect x="154" y="178" width="70" height="5" rx="1" fill="rgba(255,255,255,.18)"/><rect x="154" y="191" width="55" height="5" rx="1" fill="rgba(255,255,255,.12)"/>
+                  <rect x="270" y="155" width="108" height="68" rx="5" fill="url(#g1glass)" stroke="rgba(255,255,255,.14)" stroke-width="1"/>
+                  <rect x="278" y="163" width="50" height="7" rx="1" fill="rgba(255,255,255,.30)"/><rect x="278" y="178" width="70" height="5" rx="1" fill="rgba(255,255,255,.18)"/><rect x="278" y="191" width="55" height="5" rx="1" fill="rgba(255,255,255,.12)"/>
+                  <rect width="400" height="1" fill="rgba(255,255,255,.18)"/>
+                </svg>
+              </div>
+              <span class="card-badge">Web Design</span>
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">&lt;Project Title 01&gt;</h3>
+              <p class="card-desc">&lt;A short one-liner about this project.&gt;</p>
+              <div class="card-tags"><span class="card-tag">Figma</span><span class="card-tag">React</span><span class="card-tag">Motion</span></div>
+            </div>
+            <div class="card-footer">
+              <span class="card-year">2024</span>
+              <button class="card-expand-btn" aria-label="View details for Project Title 01">View Details <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8h12M9 3l5 5-5 5"/></svg></button>
+            </div>
+          </article>
+
+          <!-- ─── CARD 2 — Branding ─── -->
+          <article class="project-card reveal reveal-delay-1" role="listitem"
+            data-category="Branding"
+            data-title="&lt;Project Title 02&gt;"
+            data-expanded-desc="&lt;A longer, richer description of Project 02. Describe the problem, your approach, and the outcome.&gt;"
+            data-role="&lt;Brand &amp; Identity Design&gt;"
+            data-year="2024"
+            data-tags="Illustrator, Typography, Identity"
+            data-link="#"
+            tabindex="0" aria-label="Project: Project Title 02">
+
+            <div class="card-thumb" aria-hidden="true">
+              <div class="card-thumb-inner">
+                <svg class="mockup-svg" viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <linearGradient id="g2bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#052238"/><stop offset="100%" stop-color="#0c3c5a"/></linearGradient>
+                    <linearGradient id="g2acc" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#38d4b0" stop-opacity=".85"/><stop offset="100%" stop-color="#0a70a0" stop-opacity=".50"/></linearGradient>
+                    <linearGradient id="g2glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(255,255,255,0.11)"/><stop offset="100%" stop-color="rgba(255,255,255,0.03)"/></linearGradient>
+                  </defs>
+                  <rect width="400" height="250" fill="url(#g2bg)"/>
+                  <rect width="400" height="32" fill="rgba(0,0,0,.52)"/>
+                  <circle cx="14" cy="16" r="4.5" fill="#ff5f57" opacity=".9"/><circle cx="27" cy="16" r="4.5" fill="#febc2e" opacity=".9"/><circle cx="40" cy="16" r="4.5" fill="#28c840" opacity=".9"/>
+                  <rect x="58" y="9" width="210" height="14" rx="3" fill="rgba(255,255,255,.10)"/><rect x="64" y="14" width="90" height="4" rx="1" fill="rgba(255,255,255,.28)"/>
+                  <!-- Logo zone -->
+                  <rect x="22" y="48" width="356" height="70" rx="5" fill="rgba(56,212,176,.08)" stroke="rgba(56,212,176,.22)" stroke-width="1"/>
+                  <rect x="38" y="66" width="64" height="20" rx="3" fill="rgba(255,255,255,.45)"/>
+                  <rect x="114" y="66" width="130" height="20" rx="3" fill="url(#g2acc)"/>
+                  <!-- Swatches -->
+                  <rect x="22"  y="134" width="42" height="42" rx="4" fill="#0c3c5a" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
+                  <rect x="70"  y="134" width="42" height="42" rx="4" fill="#38d4b0" opacity=".9"/>
+                  <rect x="118" y="134" width="42" height="42" rx="4" fill="rgba(255,255,255,.88)"/>
+                  <rect x="166" y="134" width="42" height="42" rx="4" fill="rgba(255,255,255,.20)"/>
+                  <rect x="224" y="138" width="154" height="8" rx="2" fill="rgba(255,255,255,.34)"/>
+                  <rect x="224" y="154" width="120" height="6" rx="2" fill="rgba(255,255,255,.20)"/>
+                  <rect x="224" y="168" width="90"  height="6" rx="2" fill="rgba(255,255,255,.13)"/>
+                  <rect x="0" y="186" width="400" height="1" fill="rgba(255,255,255,.07)"/>
+                  <rect x="22" y="198" width="356" height="6" rx="2" fill="rgba(255,255,255,.09)"/>
+                  <rect x="22" y="212" width="260" height="6" rx="2" fill="rgba(255,255,255,.06)"/>
+                  <rect width="400" height="1" fill="rgba(255,255,255,.18)"/>
+                </svg>
+              </div>
+              <span class="card-badge">Branding</span>
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">&lt;Project Title 02&gt;</h3>
+              <p class="card-desc">&lt;A short one-liner about this project.&gt;</p>
+              <div class="card-tags"><span class="card-tag">Illustrator</span><span class="card-tag">Typography</span><span class="card-tag">Identity</span></div>
+            </div>
+            <div class="card-footer">
+              <span class="card-year">2024</span>
+              <button class="card-expand-btn" aria-label="View details for Project Title 02">View Details <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8h12M9 3l5 5-5 5"/></svg></button>
+            </div>
+          </article>
+
+          <!-- ─── CARD 3 — Web App ─── -->
+          <article class="project-card reveal reveal-delay-2" role="listitem"
+            data-category="Web App"
+            data-title="&lt;Project Title 03&gt;"
+            data-expanded-desc="&lt;A longer, richer description of Project 03. Describe the problem, your approach, and the outcome.&gt;"
+            data-role="&lt;Full-Stack Development&gt;"
+            data-year="2023"
+            data-tags="Next.js, Tailwind, Supabase"
+            data-link="#"
+            tabindex="0" aria-label="Project: Project Title 03">
+
+            <div class="card-thumb" aria-hidden="true">
+              <div class="card-thumb-inner">
+                <svg class="mockup-svg" viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <linearGradient id="g3bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0e0a2e"/><stop offset="100%" stop-color="#1e1268"/></linearGradient>
+                    <linearGradient id="g3bar" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#6040e0" stop-opacity=".22"/><stop offset="100%" stop-color="#8468ff" stop-opacity=".85"/></linearGradient>
+                    <linearGradient id="g3gold" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#c9a96e" stop-opacity=".22"/><stop offset="100%" stop-color="#e2ca96" stop-opacity=".85"/></linearGradient>
+                  </defs>
+                  <rect width="400" height="250" fill="url(#g3bg)"/>
+                  <rect width="400" height="32" fill="rgba(0,0,0,.52)"/>
+                  <circle cx="14" cy="16" r="4.5" fill="#ff5f57" opacity=".9"/><circle cx="27" cy="16" r="4.5" fill="#febc2e" opacity=".9"/><circle cx="40" cy="16" r="4.5" fill="#28c840" opacity=".9"/>
+                  <rect x="58" y="9" width="210" height="14" rx="3" fill="rgba(255,255,255,.10)"/><rect x="64" y="14" width="90" height="4" rx="1" fill="rgba(255,255,255,.28)"/>
+                  <!-- Sidebar -->
+                  <rect x="0" y="32" width="70" height="218" fill="rgba(0,0,0,.32)"/>
+                  <rect x="8" y="44" width="54" height="8" rx="2" fill="rgba(255,255,255,.25)"/>
+                  <rect x="8" y="60" width="54" height="8" rx="2" fill="rgba(132,104,255,.70)"/>
+                  <rect x="8" y="76" width="54" height="8" rx="2" fill="rgba(255,255,255,.12)"/>
+                  <rect x="8" y="92" width="54" height="8" rx="2" fill="rgba(255,255,255,.12)"/>
+                  <rect x="8" y="108" width="54" height="8" rx="2" fill="rgba(255,255,255,.12)"/>
+                  <!-- KPI cards -->
+                  <rect x="78"  y="40" width="74" height="38" rx="4" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
+                  <rect x="86"  y="47" width="30" height="5" rx="1" fill="rgba(255,255,255,.28)"/><rect x="86" y="60" width="50" height="10" rx="1" fill="rgba(132,104,255,.75)"/>
+                  <rect x="158" y="40" width="74" height="38" rx="4" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
+                  <rect x="166" y="47" width="30" height="5" rx="1" fill="rgba(255,255,255,.28)"/><rect x="166" y="60" width="50" height="10" rx="1" fill="rgba(201,169,110,.75)"/>
+                  <rect x="238" y="40" width="74" height="38" rx="4" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
+                  <rect x="246" y="47" width="30" height="5" rx="1" fill="rgba(255,255,255,.28)"/><rect x="246" y="60" width="50" height="10" rx="1" fill="rgba(56,210,140,.75)"/>
+                  <!-- Bars -->
+                  <rect x="78"  y="155" width="16" height="42" rx="2" fill="url(#g3bar)"/>
+                  <rect x="100" y="140" width="16" height="57" rx="2" fill="url(#g3bar)"/>
+                  <rect x="122" y="162" width="16" height="35" rx="2" fill="url(#g3bar)"/>
+                  <rect x="144" y="148" width="16" height="49" rx="2" fill="url(#g3bar)"/>
+                  <rect x="166" y="135" width="16" height="62" rx="2" fill="url(#g3gold)"/>
+                  <rect x="188" y="144" width="16" height="53" rx="2" fill="url(#g3gold)"/>
+                  <line x1="78" y1="135" x2="318" y2="135" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                  <line x1="78" y1="155" x2="318" y2="155" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                  <line x1="78" y1="175" x2="318" y2="175" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                  <line x1="78" y1="197" x2="318" y2="197" stroke="rgba(255,255,255,.10)" stroke-width="1"/>
+                  <rect x="78" y="204" width="234" height="6" rx="1" fill="rgba(255,255,255,.08)"/>
+                  <rect x="78" y="216" width="200" height="6" rx="1" fill="rgba(255,255,255,.06)"/>
+                  <rect width="400" height="1" fill="rgba(255,255,255,.18)"/>
+                </svg>
+              </div>
+              <span class="card-badge">Web App</span>
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">&lt;Project Title 03&gt;</h3>
+              <p class="card-desc">&lt;A short one-liner about this project.&gt;</p>
+              <div class="card-tags"><span class="card-tag">Next.js</span><span class="card-tag">Tailwind</span><span class="card-tag">Supabase</span></div>
+            </div>
+            <div class="card-footer">
+              <span class="card-year">2023</span>
+              <button class="card-expand-btn" aria-label="View details for Project Title 03">View Details <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8h12M9 3l5 5-5 5"/></svg></button>
+            </div>
+          </article>
+
+          <!-- ─── CARD 4 — Mobile UI ─── -->
+          <article class="project-card reveal reveal-delay-1" role="listitem"
+            data-category="Mobile UI"
+            data-title="&lt;Project Title 04&gt;"
+            data-expanded-desc="&lt;A longer, richer description of Project 04. Describe the problem, your approach, and the outcome.&gt;"
+            data-role="&lt;UI Design &amp; Prototyping&gt;"
+            data-year="2023"
+            data-tags="Figma, iOS, Prototype"
+            data-link="#"
+            tabindex="0" aria-label="Project: Project Title 04">
+
+            <div class="card-thumb" aria-hidden="true">
+              <div class="card-thumb-inner">
+                <svg class="mockup-svg" viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <linearGradient id="g4bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#062018"/><stop offset="100%" stop-color="#0c3c2c"/></linearGradient>
+                    <linearGradient id="g4glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(255,255,255,0.13)"/><stop offset="100%" stop-color="rgba(255,255,255,0.05)"/></linearGradient>
+                  </defs>
+                  <rect width="400" height="250" fill="url(#g4bg)"/>
+                  <!-- Center phone -->
+                  <rect x="152" y="14" width="96" height="200" rx="14" fill="rgba(0,0,0,.52)" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+                  <rect x="176" y="18" width="48" height="10" rx="5" fill="rgba(0,0,0,.90)"/>
+                  <rect x="156" y="32" width="88" height="166" rx="6" fill="rgba(18,44,34,.80)"/>
+                  <rect x="156" y="32" width="88" height="28" fill="rgba(0,0,0,.40)"/>
+                  <rect x="162" y="40" width="44" height="7" rx="1" fill="rgba(255,255,255,.40)"/>
+                  <!-- App rows -->
+                  <rect x="160" y="66"  width="80" height="28" rx="4" fill="url(#g4glass)" stroke="rgba(255,255,255,.14)" stroke-width=".8"/>
+                  <rect x="165" y="72"  width="36" height="5" rx="1" fill="rgba(255,255,255,.36)"/><rect x="165" y="83" width="55" height="4" rx="1" fill="rgba(255,255,255,.20)"/>
+                  <rect x="160" y="100" width="80" height="28" rx="4" fill="url(#g4glass)" stroke="rgba(255,255,255,.14)" stroke-width=".8"/>
+                  <rect x="165" y="106" width="36" height="5" rx="1" fill="rgba(34,224,160,.50)"/><rect x="165" y="117" width="55" height="4" rx="1" fill="rgba(255,255,255,.20)"/>
+                  <rect x="160" y="134" width="80" height="28" rx="4" fill="url(#g4glass)" stroke="rgba(255,255,255,.14)" stroke-width=".8"/>
+                  <rect x="165" y="140" width="36" height="5" rx="1" fill="rgba(255,255,255,.28)"/><rect x="165" y="151" width="55" height="4" rx="1" fill="rgba(255,255,255,.16)"/>
+                  <rect x="156" y="172" width="88" height="26" fill="rgba(0,0,0,.55)"/>
+                  <circle cx="178" cy="185" r="5" fill="rgba(34,224,160,.70)"/>
+                  <circle cx="200" cy="185" r="5" fill="rgba(255,255,255,.22)"/>
+                  <circle cx="222" cy="185" r="5" fill="rgba(255,255,255,.22)"/>
+                  <!-- Side phones -->
+                  <rect x="50"  y="42" width="80" height="156" rx="12" fill="rgba(0,0,0,.34)" stroke="rgba(255,255,255,.10)" stroke-width="1" opacity=".7"/>
+                  <rect x="270" y="42" width="80" height="156" rx="12" fill="rgba(0,0,0,.34)" stroke="rgba(255,255,255,.10)" stroke-width="1" opacity=".7"/>
+                  <rect x="54"  y="58" width="72" height="124" rx="6" fill="rgba(10,32,20,.60)" opacity=".7"/>
+                  <rect x="274" y="58" width="72" height="124" rx="6" fill="rgba(10,32,20,.60)" opacity=".7"/>
+                  <rect width="400" height="1" fill="rgba(255,255,255,.18)"/>
+                </svg>
+              </div>
+              <span class="card-badge">Mobile UI</span>
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">&lt;Project Title 04&gt;</h3>
+              <p class="card-desc">&lt;A short one-liner about this project.&gt;</p>
+              <div class="card-tags"><span class="card-tag">Figma</span><span class="card-tag">iOS</span><span class="card-tag">Prototype</span></div>
+            </div>
+            <div class="card-footer">
+              <span class="card-year">2023</span>
+              <button class="card-expand-btn" aria-label="View details for Project Title 04">View Details <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8h12M9 3l5 5-5 5"/></svg></button>
+            </div>
+          </article>
+
+          <!-- ─── CARD 5 — E-Commerce ─── -->
+          <article class="project-card reveal reveal-delay-2" role="listitem"
+            data-category="E-Commerce"
+            data-title="&lt;Project Title 05&gt;"
+            data-expanded-desc="&lt;A longer, richer description of Project 05. Describe the problem, your approach, and the outcome.&gt;"
+            data-role="&lt;Design &amp; Development&gt;"
+            data-year="2022"
+            data-tags="Shopify, GSAP, UX Research"
+            data-link="#"
+            tabindex="0" aria-label="Project: Project Title 05">
+
+            <div class="card-thumb" aria-hidden="true">
+              <div class="card-thumb-inner">
+                <svg class="mockup-svg" viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <linearGradient id="g5bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a0c08"/><stop offset="100%" stop-color="#3a1a10"/></linearGradient>
+                    <linearGradient id="g5acc" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#c9a96e" stop-opacity=".90"/><stop offset="100%" stop-color="#e07040" stop-opacity=".55"/></linearGradient>
+                    <linearGradient id="g5glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(255,255,255,0.12)"/><stop offset="100%" stop-color="rgba(255,255,255,0.04)"/></linearGradient>
+                  </defs>
+                  <rect width="400" height="250" fill="url(#g5bg)"/>
+                  <rect width="400" height="32" fill="rgba(0,0,0,.52)"/>
+                  <circle cx="14" cy="16" r="4.5" fill="#ff5f57" opacity=".9"/><circle cx="27" cy="16" r="4.5" fill="#febc2e" opacity=".9"/><circle cx="40" cy="16" r="4.5" fill="#28c840" opacity=".9"/>
+                  <rect x="58" y="9" width="210" height="14" rx="3" fill="rgba(255,255,255,.10)"/><rect x="64" y="14" width="90" height="4" rx="1" fill="rgba(255,255,255,.28)"/>
+                  <!-- Nav -->
+                  <rect x="22" y="42" width="356" height="22" rx="3" fill="rgba(255,255,255,.04)"/>
+                  <rect x="30" y="49" width="50" height="7" rx="1" fill="rgba(255,255,255,.35)"/>
+                  <rect x="200" y="49" width="40" height="7" rx="1" fill="rgba(255,255,255,.18)"/>
+                  <rect x="248" y="49" width="40" height="7" rx="1" fill="rgba(255,255,255,.18)"/>
+                  <!-- Product cards -->
+                  <rect x="22"  y="76" width="90" height="120" rx="5" fill="url(#g5glass)" stroke="rgba(255,255,255,.13)" stroke-width="1"/>
+                  <rect x="30"  y="84" width="74" height="52" rx="3" fill="rgba(255,255,255,.08)"/>
+                  <rect x="30"  y="142" width="55" height="6" rx="1" fill="rgba(255,255,255,.38)"/>
+                  <rect x="30"  y="154" width="42" height="5" rx="1" fill="rgba(201,169,110,.75)"/>
+                  <rect x="30"  y="166" width="60" height="18" rx="3" fill="url(#g5acc)"/>
+                  <rect x="122" y="76" width="90" height="120" rx="5" fill="url(#g5glass)" stroke="rgba(255,255,255,.13)" stroke-width="1"/>
+                  <rect x="130" y="84" width="74" height="52" rx="3" fill="rgba(255,255,255,.08)"/>
+                  <rect x="130" y="142" width="55" height="6" rx="1" fill="rgba(255,255,255,.38)"/>
+                  <rect x="130" y="154" width="42" height="5" rx="1" fill="rgba(201,169,110,.75)"/>
+                  <rect x="130" y="166" width="60" height="18" rx="3" fill="url(#g5acc)"/>
+                  <rect x="222" y="76" width="90" height="120" rx="5" fill="url(#g5glass)" stroke="rgba(255,255,255,.13)" stroke-width="1"/>
+                  <rect x="230" y="84" width="74" height="52" rx="3" fill="rgba(255,255,255,.08)"/>
+                  <rect x="230" y="142" width="55" height="6" rx="1" fill="rgba(255,255,255,.38)"/>
+                  <rect x="230" y="154" width="42" height="5" rx="1" fill="rgba(201,169,110,.75)"/>
+                  <rect x="230" y="166" width="60" height="18" rx="3" fill="url(#g5acc)"/>
+                  <rect width="400" height="1" fill="rgba(255,255,255,.18)"/>
+                </svg>
+              </div>
+              <span class="card-badge">E-Commerce</span>
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">&lt;Project Title 05&gt;</h3>
+              <p class="card-desc">&lt;A short one-liner about this project.&gt;</p>
+              <div class="card-tags"><span class="card-tag">Shopify</span><span class="card-tag">GSAP</span><span class="card-tag">UX Research</span></div>
+            </div>
+            <div class="card-footer">
+              <span class="card-year">2022</span>
+              <button class="card-expand-btn" aria-label="View details for Project Title 05">View Details <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8h12M9 3l5 5-5 5"/></svg></button>
+            </div>
+          </article>
+
+          <!-- ─── CARD 6 — Dashboard ─── -->
+          <article class="project-card reveal reveal-delay-3" role="listitem"
+            data-category="Dashboard"
+            data-title="&lt;Project Title 06&gt;"
+            data-expanded-desc="&lt;A longer, richer description of Project 06. Describe the problem, your approach, and the outcome.&gt;"
+            data-role="&lt;Product Design&gt;"
+            data-year="2022"
+            data-tags="React, D3.js, Design System"
+            data-link="#"
+            tabindex="0" aria-label="Project: Project Title 06">
+
+            <div class="card-thumb" aria-hidden="true">
+              <div class="card-thumb-inner">
+                <svg class="mockup-svg" viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <linearGradient id="g6bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#090c1e"/><stop offset="100%" stop-color="#141830"/></linearGradient>
+                    <linearGradient id="g6line" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8060ff"/><stop offset="50%" stop-color="#c9a96e"/><stop offset="100%" stop-color="#40cccc"/></linearGradient>
+                    <linearGradient id="g6area" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8060ff" stop-opacity=".30"/><stop offset="100%" stop-color="#8060ff" stop-opacity=".02"/></linearGradient>
+                  </defs>
+                  <rect width="400" height="250" fill="url(#g6bg)"/>
+                  <rect width="400" height="32" fill="rgba(0,0,0,.52)"/>
+                  <circle cx="14" cy="16" r="4.5" fill="#ff5f57" opacity=".9"/><circle cx="27" cy="16" r="4.5" fill="#febc2e" opacity=".9"/><circle cx="40" cy="16" r="4.5" fill="#28c840" opacity=".9"/>
+                  <rect x="58" y="9" width="210" height="14" rx="3" fill="rgba(255,255,255,.10)"/><rect x="64" y="14" width="90" height="4" rx="1" fill="rgba(255,255,255,.28)"/>
+                  <!-- Sidebar -->
+                  <rect x="0" y="32" width="66" height="218" fill="rgba(0,0,0,.35)"/>
+                  <rect x="8" y="44" width="50" height="7" rx="2" fill="rgba(255,255,255,.24)"/>
+                  <rect x="8" y="60" width="50" height="7" rx="2" fill="rgba(128,96,255,.65)"/>
+                  <rect x="8" y="76" width="50" height="7" rx="2" fill="rgba(255,255,255,.12)"/>
+                  <rect x="8" y="92" width="50" height="7" rx="2" fill="rgba(255,255,255,.12)"/>
+                  <!-- KPIs -->
+                  <rect x="74"  y="40" width="76" height="36" rx="4" fill="rgba(255,255,255,.055)" stroke="rgba(255,255,255,.10)" stroke-width="1"/>
+                  <rect x="82"  y="47" width="32" height="5" rx="1" fill="rgba(255,255,255,.28)"/><rect x="82" y="59" width="52" height="9" rx="1" fill="rgba(128,96,255,.70)"/>
+                  <rect x="156" y="40" width="76" height="36" rx="4" fill="rgba(255,255,255,.055)" stroke="rgba(255,255,255,.10)" stroke-width="1"/>
+                  <rect x="164" y="47" width="32" height="5" rx="1" fill="rgba(255,255,255,.28)"/><rect x="164" y="59" width="52" height="9" rx="1" fill="rgba(201,169,110,.70)"/>
+                  <rect x="238" y="40" width="76" height="36" rx="4" fill="rgba(255,255,255,.055)" stroke="rgba(255,255,255,.10)" stroke-width="1"/>
+                  <rect x="246" y="47" width="32" height="5" rx="1" fill="rgba(255,255,255,.28)"/><rect x="246" y="59" width="52" height="9" rx="1" fill="rgba(64,204,204,.70)"/>
+                  <!-- Area fill -->
+                  <polygon points="74,197 112,172 150,180 188,158 226,145 264,162 302,140 320,133 320,197" fill="url(#g6area)"/>
+                  <!-- Line -->
+                  <polyline points="74,197 112,172 150,180 188,158 226,145 264,162 302,140 320,133" fill="none" stroke="url(#g6line)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="112" cy="172" r="3" fill="#8060ff"/>
+                  <circle cx="188" cy="158" r="3" fill="#c9a96e"/>
+                  <circle cx="264" cy="162" r="3" fill="#40cccc"/>
+                  <circle cx="320" cy="133" r="3.5" fill="#fff" opacity=".9"/>
+                  <!-- Grid -->
+                  <line x1="74" y1="133" x2="320" y2="133" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                  <line x1="74" y1="155" x2="320" y2="155" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                  <line x1="74" y1="177" x2="320" y2="177" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                  <line x1="74" y1="197" x2="320" y2="197" stroke="rgba(255,255,255,.10)" stroke-width="1"/>
+                  <rect x="86"  y="202" width="28" height="4" rx="1" fill="rgba(255,255,255,.14)"/>
+                  <rect x="150" y="202" width="28" height="4" rx="1" fill="rgba(255,255,255,.14)"/>
+                  <rect x="214" y="202" width="28" height="4" rx="1" fill="rgba(255,255,255,.14)"/>
+                  <rect x="278" y="202" width="28" height="4" rx="1" fill="rgba(255,255,255,.14)"/>
+                  <rect x="74" y="216" width="246" height="6" rx="1" fill="rgba(255,255,255,.07)"/>
+                  <rect x="74" y="228" width="200" height="6" rx="1" fill="rgba(255,255,255,.05)"/>
+                  <rect width="400" height="1" fill="rgba(255,255,255,.18)"/>
+                </svg>
+              </div>
+              <span class="card-badge">Dashboard</span>
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">&lt;Project Title 06&gt;</h3>
+              <p class="card-desc">&lt;A short one-liner about this project.&gt;</p>
+              <div class="card-tags"><span class="card-tag">React</span><span class="card-tag">D3.js</span><span class="card-tag">Design System</span></div>
+            </div>
+            <div class="card-footer">
+              <span class="card-year">2022</span>
+              <button class="card-expand-btn" aria-label="View details for Project Title 06">View Details <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8h12M9 3l5 5-5 5"/></svg></button>
+            </div>
+          </article>
+
+          <!-- ════════════════════════════════════════
+               ↑ ADD MORE CARDS ABOVE THIS LINE
+               Duplicate any <article class="project-card"> block.
+               Update all data-* attributes and SVG gradient IDs.
+               ════════════════════════════════════════ -->
+
+        </div><!-- /project-grid -->
+      </div><!-- /container -->
+    </section>
+
+    <!-- Expanded drawer -->
+    <div class="card-expanded-overlay" id="expanded-overlay" aria-hidden="true" role="presentation"></div>
+    <aside class="card-expanded-panel" id="expanded-panel" role="dialog" aria-modal="true" aria-label="Project details" aria-hidden="true">
+      <div class="expanded-close">
+        <button class="close-btn" id="expanded-close-btn" aria-label="Close project details">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg>
+          Close
+        </button>
+      </div>
+      <div class="expanded-thumb"><div class="expanded-thumb-inner" id="expanded-thumb-inner"></div></div>
+      <div class="expanded-body">
+        <span class="expanded-badge" id="expanded-badge"></span>
+        <h2  class="expanded-title"  id="expanded-title"></h2>
+        <p   class="expanded-desc"   id="expanded-desc"></p>
+        <div class="expanded-meta">
+          <div><p class="meta-label">Role</p><p class="meta-value" id="expanded-role"></p></div>
+          <div><p class="meta-label">Year</p><p class="meta-value" id="expanded-year"></p></div>
+        </div>
+        <div class="expanded-tags" id="expanded-tags"></div>
+        <a class="expanded-link" id="expanded-link" href="#" target="_blank" rel="noopener noreferrer">
+          View Project
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8h12M9 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </aside>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section" aria-labelledby="contact-title">
+      <div class="container">
+        <span class="eyebrow reveal">003 — Let's Talk</span>
+        <div class="contact-inner">
+          <div>
+            <h2 class="contact-title reveal reveal-delay-1" id="contact-title">Start a<br><em>Conversation.</em></h2>
+            <p class="contact-sub reveal reveal-delay-2">Open to new projects, collaborations, and creative conversations. Reach out — let's build something meaningful together.</p>
+          </div>
+          <!-- ════════════════════════════════════════════
+               CONTACT INFORMATION PLACEHOLDERS
+               Replace each value with real contact details.
+               ════════════════════════════════════════════ -->
+          <div class="contact-info reveal reveal-delay-2" aria-label="Contact information">
+            <div class="contact-item">
+              <span class="ci-label">Phone</span>
+              <div class="ci-val"><a href="tel:+10000000000">&lt;phone number&gt;</a></div>
+            </div>
+            <div class="contact-item">
+              <span class="ci-label">Email</span>
+              <div class="ci-val"><a href="mailto:hello@example.com">&lt;email address&gt;</a></div>
+            </div>
+            <div class="contact-item">
+              <span class="ci-label">Social</span>
+              <div class="ci-val">
+                <div class="social-row">
+                  <a href="#" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>Facebook
+                  </a>
+                  <a href="#" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>Instagram
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-inner">
+        <p class="footer-copy">&copy; <span id="footer-year"></span> &lt;Name&gt;. All rights reserved.</p>
+        <p class="footer-mark">Crafted with <span>♦</span> precision.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    /* 1. FOOTER YEAR */
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    /* 2. PROJECT COUNT */
+    (function(){
+      const cards = document.querySelectorAll('.project-card');
+      const el = document.getElementById('project-count');
+      if (el) el.textContent = String(cards.length).padStart(2,'0') + ' Projects';
+    })();
+
+    /* 3. CUSTOM CURSOR */
+    (function(){
+      const dot  = document.getElementById('cursor-dot');
+      const ring = document.getElementById('cursor-ring');
+      let mx=0, my=0, rx=0, ry=0;
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+      });
+      (function lerp(){
+        rx += (mx-rx)*0.13; ry += (my-ry)*0.13;
+        ring.style.left = rx+'px'; ring.style.top = ry+'px';
+        requestAnimationFrame(lerp);
+      })();
+      document.querySelectorAll('a,button,[role="listitem"],.project-card').forEach(el=>{
+        el.addEventListener('mouseenter', ()=>document.body.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', ()=>document.body.classList.remove('cursor-hover'));
+      });
+    })();
+
+    /* 4. PARTICLE CANVAS — blue + gold cursor trail */
+    (function(){
+      const canvas = document.getElementById('particle-canvas');
+      const ctx    = canvas.getContext('2d');
+      let W, H;
+      const pts = [];
+      function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+      resize();
+      window.addEventListener('resize', resize, {passive:true});
+      document.addEventListener('mousemove', e => {
+        for(let i=0;i<2;i++) spawn(e.clientX, e.clientY);
+      }, {passive:true});
+      function spawn(x,y){
+        const a = Math.random()*Math.PI*2, s = Math.random()*.55+.18;
+        const p = {x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-.28,size:Math.random()*1.5+.4};
+        p.life = p.maxLife = Math.random()*58+30;
+        p.hue  = Math.random()>.7 ? (38+Math.random()*14) : (210+Math.random()*28);
+        pts.push(p);
+      }
+      function tick(){
+        ctx.clearRect(0,0,W,H);
+        for(let i=pts.length-1;i>=0;i--){
+          const p=pts[i];
+          p.x+=p.vx; p.y+=p.vy; p.vy+=.012; p.life--;
+          if(p.life<=0){pts.splice(i,1);continue;}
+          const alpha=(p.life/p.maxLife)*.50;
+          const radius=p.size*(p.life/p.maxLife);
+          ctx.beginPath(); ctx.arc(p.x,p.y,radius,0,Math.PI*2);
+          ctx.fillStyle=`hsla(${p.hue},72%,72%,${alpha})`; ctx.fill();
+        }
+        requestAnimationFrame(tick);
+      }
+      tick();
+    })();
+
+    /* 5. SCROLL REVEAL */
+    (function(){
+      const io = new IntersectionObserver(entries=>{
+        entries.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('is-visible');io.unobserve(e.target);} });
+      },{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+      document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+    })();
+
+    /* 6. NAV SCROLL STATE */
+    (function(){
+      const nav=document.getElementById('nav');
+      window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>60),{passive:true});
+    })();
+
+    /* 7. MOBILE NAV */
+    (function(){
+      const toggle=document.getElementById('nav-toggle');
+      const mob=document.getElementById('nav-mobile');
+      let open=false;
+      function openMenu(){
+        open=true; mob.classList.add('open'); toggle.setAttribute('aria-expanded','true');
+        document.body.style.overflow='hidden';
+        const [a,b,c]=toggle.querySelectorAll('span');
+        a.style.transform='translateY(6px) rotate(45deg)'; b.style.opacity='0'; c.style.transform='translateY(-6px) rotate(-45deg)';
+      }
+      function closeMenu(){
+        open=false; mob.classList.remove('open'); toggle.setAttribute('aria-expanded','false');
+        document.body.style.overflow='';
+        const [a,b,c]=toggle.querySelectorAll('span');
+        a.style.transform=''; b.style.opacity=''; c.style.transform='';
+      }
+      toggle.addEventListener('click',()=>open?closeMenu():openMenu());
+      mob.querySelectorAll('.mobile-nav-link').forEach(l=>l.addEventListener('click',closeMenu));
+    })();
+
+    /* 8. EXPANDED CARD DRAWER */
+    (function(){
+      const overlay  = document.getElementById('expanded-overlay');
+      const panel    = document.getElementById('expanded-panel');
+      const closeBtn = document.getElementById('expanded-close-btn');
+      const thumbEl  = document.getElementById('expanded-thumb-inner');
+      const badgeEl  = document.getElementById('expanded-badge');
+      const titleEl  = document.getElementById('expanded-title');
+      const descEl   = document.getElementById('expanded-desc');
+      const roleEl   = document.getElementById('expanded-role');
+      const yearEl   = document.getElementById('expanded-year');
+      const tagsEl   = document.getElementById('expanded-tags');
+      const linkEl   = document.getElementById('expanded-link');
+      let lastFocus  = null;
+
+      function openPanel(card){
+        lastFocus = document.activeElement;
+        const svg = card.querySelector('.mockup-svg');
+        thumbEl.innerHTML = '';
+        if(svg){
+          const clone = svg.cloneNode(true);
+          clone.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+          thumbEl.appendChild(clone);
+        }
+        const tags = (card.dataset.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
+        badgeEl.textContent = card.dataset.category     || '';
+        titleEl.textContent = card.dataset.title        || '';
+        descEl.textContent  = card.dataset.expandedDesc || '';
+        roleEl.textContent  = card.dataset.role         || '';
+        yearEl.textContent  = card.dataset.year         || '';
+        linkEl.href         = card.dataset.link         || '#';
+        tagsEl.innerHTML    = tags.map(t=>`<span class="expanded-tag">${t}</span>`).join('');
+        overlay.classList.add('open'); panel.classList.add('open');
+        overlay.setAttribute('aria-hidden','false'); panel.setAttribute('aria-hidden','false');
+        document.body.style.overflow='hidden';
+        setTimeout(()=>closeBtn.focus(),60);
+      }
+      function closePanel(){
+        overlay.classList.remove('open'); panel.classList.remove('open');
+        overlay.setAttribute('aria-hidden','true'); panel.setAttribute('aria-hidden','true');
+        document.body.style.overflow='';
+        if(lastFocus){lastFocus.focus();lastFocus=null;}
+      }
+
+      document.querySelectorAll('.project-card').forEach(card=>{
+        card.querySelector('.card-expand-btn')?.addEventListener('click',e=>{e.stopPropagation();openPanel(card);});
+        card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openPanel(card);}});
+      });
+      closeBtn.addEventListener('click',closePanel);
+      overlay.addEventListener('click',closePanel);
+      document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))closePanel();});
+      panel.addEventListener('keydown',e=>{
+        if(e.key!=='Tab')return;
+        const els=[...panel.querySelectorAll('button,a[href],[tabindex]:not([tabindex="-1"])')];
+        const [first,last]=[els[0],els[els.length-1]];
+        if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+        else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+      });
+    })();
+
+    /* 9. SMOOTH ANCHOR SCROLL */
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click',e=>{
+        const t=document.querySelector(a.getAttribute('href'));
+        if(!t)return; e.preventDefault();
+        t.scrollIntoView({behavior:'smooth',block:'start'});
+      });
+    });
+  </script>
+
+</body>
+</html>
